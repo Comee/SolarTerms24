@@ -1,5 +1,7 @@
 0.jython下文件说明
-   【主函数   】 main.py        程序运行的主函数
+
+   【主函数   】 
+          main.py        程序运行的主函数
           SolarTerms.py  辅助模块，包含大部分的天文运行，角度计算等，用于生成24节气
           Util.py        工具模块，包括：项目路径，读取配置文件等
           JDate.py       日期类，和日期相关的操作，如：计算两个日期的相差的天数
@@ -12,16 +14,17 @@
     
 
 1.运行脚本
-  jython目录下，选择main.py
+     jython目录下，选择main.py
      右键>Run As > Jython Run
 
 2.运行环境及配置方法
      
      待测数据配置：
-  input目录下的input.ini
+     input目录下的input.ini
+     
      例如测试数据如下：
-    [ConfigOrParameters]    
-    cop:2014,2013,2008,2012
+     [ConfigOrParameters]    
+     cop:2014,2013,2008,2012
   
      说明：cop为要查看的年份，逗号分隔
     
@@ -30,12 +33,9 @@
       生成24节气表
 
 4.测试用输入文件、预期输出文件，实际输出文件
-      测试用输入文件：
-    【input.ini】
-     预期输出文件：
-     【expected.txt】
-     实际输出文件:
-     【output.txt】
+      测试用输入文件：【input.ini】
+      预期输出文件：  【expected.txt】
+      实际输出文件:   【output.txt】
        
 
 5.功能列表本人测试结果
