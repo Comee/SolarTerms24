@@ -12,7 +12,10 @@ RAD = 180 / math.pi  # 每弧度的角度数
 
 def rad2mrad(v):  # 对超过0-2PI的角度转为0-2PI
     v = v % (2 * math.pi)
-    return v
+    if(v < 0):
+        return v + 2*math.pi
+    else:
+        return v
 
 def rad2str(d, tim):  # 将弧度转为字串
     # tim=0输出格式示例: -23°59' 48.23"
@@ -79,7 +82,7 @@ def addPrece(jd, zb):  # 补岁差
     t = 1
     v = 0
     t1 = jd / (365250 - 0.0)
-    for i in range(8):
+    for i in range(1, 8):
         t *= t1
         v += preceB[i] * t
     zb[0] = rad2mrad(zb[0] + (v + 2.9965 * t1) / rad)
@@ -87,7 +90,7 @@ def addPrece(jd, zb):  # 补岁差
 #===============光行差==================
 GXC_e = [0.016708634, -0.000042037, -0.0000001267]  # 离心率
 GXC_p = [102.93735 / RAD, 1.71946 / RAD, 0.00046 / RAD]  # 近点
-GXC_l = [280.4664567 / RAD, 36000.76982779 / RAD, 0.0003032028 / RAD, 1 / 49931000 / RAD, -1 / 153000000 / RAD]  # 太平黄经
+GXC_l = [280.4664567 / RAD, 36000.76982779 / RAD, 0.0003032028 / RAD, (1 - 0.0) / 49931000 / RAD, (-1 - 0.0) / 153000000 / RAD]  # 太平黄经
 GXC_k = 20.49552 / rad  # 光行差常数
 
 def addGxc(t, zb):  # 恒星周年光行差计算(黄道坐标中)
@@ -129,8 +132,8 @@ def nutation(t):  # 计算黄经章动及交角章动
         c = nutB[i] + nutB[i + 1] * t1 + nutB[i + 2] * t2 + nutB[i + 3] * t3 + nutB[i + 4] * t4
         d['Lon'] += (nutB[i + 5] + nutB[i + 6] * t / 10) * math.sin(c)  # 黄经章动
         d['Obl'] += (nutB[i + 7] + nutB[i + 8] * t / 10) * math.cos(c)  # 交角章动
-    d['Lon'] /= rad * 10000  # 黄经章动
-    d['Obl'] /= rad * 10000  # 交角章动
+    d['Lon'] /= (rad * 10000 - 0.0)  # 黄经章动
+    d['Obl'] /= (rad * 10000 - 0.0)  # 交角章动
     return d
 
 def nutationRaDec(t, zb):  # 本函数计算赤经章动及赤纬章动
@@ -360,7 +363,7 @@ def jiaoCal(t1, jiao, lx):
     jiao *= math.pi / (180 - 0.0)  # 待搜索目标角
     
     # 测试
-#     print (t1,t2,jiao)
+    # print (t1,t2,jiao)
     
     # 利用截弦法计算
     v1 = jiaoCai(lx, t1, jiao)  # v1,v2为t1,t2时对应的黄经
@@ -390,8 +393,8 @@ def jiaoCal(t1, jiao, lx):
         v1 = v2
         t2 = t
         v2 = v  # 下一次截弦
-# 测试
-#     print t
+    # 测试
+    # print t
     return t
 
 # ==================节气计算===================
@@ -439,7 +442,7 @@ def paiYue(year):
         # 测试
         # print (jiaoCal(t1 + i * 30.4, i * 30 - 90, 0), jiaoCal(t1 + i * 30.4, i * 30 - 105, 0))
     # 在冬至过后,连续计算14个日月合朔时刻
-#     print jq
+    # print jq
     dongZhiJia1 = zq[0] + 1 - jDate.Dint_dec(zq[0], 8, 0)  # 冬至过后的第一天0点的儒略日数
     # 测试 OK
     #print dongZhiJia1
@@ -448,7 +451,7 @@ def paiYue(year):
         hs.append(jiaoCal(hs[i - 1] + 25, 0, 1))
     # 算出中气及合朔时刻的日数(不含小数的日数计数,以便计算日期之间的差值)
     # 测试
-    #print hs
+    # print hs
     A = []
     B = []
     C = []
@@ -459,17 +462,17 @@ def paiYue(year):
     # 闰月及大小月分析
     tot = 12
     nun = -1
-    j = 0
+    # j = 0
     yn = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 0, 0]  # 月编号
     if (C[12] <= A[12]):  # 闰月分析
         yn[12] = 12
         tot = 13  # 编号为12的月是本年的有效月份,本年总月数13个
-        for i in range(13):
+        for i in range(1,13):
             if (C[i] <= A[i]):
                 break
-        nun = j - 1
-        for j in range(nun, 13):
-            yn[j - 1] -= 1  # 注意yn中不含农历首月(所以取i-1),在公历中农历首月总是去年的所以不多做计算
+        nun = i - 1
+        for num in range(nun, 12):
+            yn[num] -= 1  # 注意yn中不含农历首月(所以取i-1),在公历中农历首月总是去年的所以不多做计算
     for i in range(tot):  # 转为建寅月名,并做大小月分析
         yn[i] = yueMing[(yn[i] + 10) % 12]  # 转建寅月名
         if (i == nun):
@@ -481,7 +484,7 @@ def paiYue(year):
         else:
             yn[i] += "小"  # 标记大小月
     # 显示
-    out = "节气                   手表时                         中气                             手表时              农历月                    朔的手表时\r\n"
+    out = "节气  手表时              中气  手表时              农历月  朔的手表时\r\n"
     for i in range(tot):
         zm = (i * 2 + 18) % 24
         jm = (i * 2 + 17) % 24  # 中气名节气名
@@ -494,9 +497,5 @@ def paiYue(year):
     return out 
     
 if __name__ == '__main__':
-    print paiYue(2014)
-#     print rad2mrad(3 * math.pi), rad2mrad(-3 * math.pi)
-#     print rad2str(math.pi, 0), rad2str(math.pi, 1)
-#     print hcjj1(1)
-#     print nutation(6)
+    print paiYue(2017)
     
